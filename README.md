@@ -48,6 +48,9 @@ The CDN Transcode Sample may run on Linux* 64 bit operating systems. The list be
 - CentOS* 7.6
 
 # How to setup The CDN Transcode Sample
+
+**NB**: The steps taken by the Ressource-Allocation research group are described in the [Deployment section](https://github.com/Ressource-Allocation/CDN-Transcode-Sample/wiki/Deployment) of the Wiki.
+
 ## Setup the CDN Transcode Sample OS environment(Both of master and slave nodes)
 Install Ubuntu 18.04.2/CentOS 7.6 on CDN-Transcode Server, and configure the IP address & proxy properly.
 ### Install ubuntu18.04.2/CentOS 7.6
