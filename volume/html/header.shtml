@@ -1,92 +1,99 @@
 <div class="top-bar" style="background-color:#0071c5" ui-header>
-  <div class="top-bar-left">
-    <ul class="dropdown menu" data-dropdown-menu style="background-color:#0071c5;">
-      <li class="menu-text">
-        <h4 style="color:#FDEDEC">CDN Transcode Sample</h4>
-      </li>
-    </ul>
-  </div>
-  <div class="top-bar-right" ui-header-setting>
-      <ul class="dropdown menu" data-dropdown-menu style="background-color:gray;color:white">
-      <li><a href="#" user-name-menu class="menu-text">guest</a>
-        <ul class="menu" style="background-color:gray">
-          <li><a href="#" data-open="setting" class="menu-text"><i class="fi-key"></i>&nbsp;Setting</a></li>
-          <li><a href="#" data-open="upload" class="menu-text"><i class="fi-key"></i>&nbsp;Upload</a></li>
-          <li><a href="#" data-open="upload-offline" class="menu-text"><i class="fi-key"></i>&nbsp;Upload Offline</a></li>
-          <li><a href="#" data-open="clear" class="menu-text"><i class="fi-key"></i>&nbsp;Clear (WIP)</a></li>
+    <div class="top-bar-left">
+        <ul class="dropdown menu" data-dropdown-menu style="background-color:#0071c5;">
+            <li class="menu-text">
+                <h4 style="color:#FDEDEC">CDN Transcode Sample</h4>
+            </li>
         </ul>
-      </li>
-    </ul>
-  </div>
+    </div>
+    <div class="top-bar-right" ui-header-setting>
+        <ul class="dropdown menu" data-dropdown-menu style="background-color:gray;color:white">
+            <li><a href="#" user-name-menu class="menu-text">guest</a>
+                <ul class="menu" style="background-color:gray">
+                    <li><a href="#" data-open="setting" class="menu-text"><i class="fi-info"></i>&nbsp;Setting</a></li>
+                    <li><a href="#" data-open="upload" class="menu-text"><i class="fi-upload"></i>&nbsp;Upload</a></li>
+                    <li><a href="#" data-open="upload-offline" class="menu-text"><i class="fi-upload-cloud"></i>&nbsp;Upload
+                        Offline</a></li>
+                    <li><a href="#" data-open="clear" class="menu-text"><i class="fi-trash"></i>&nbsp;Clear
+                        processed</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 </div>
 
 <div class="reveal" id="setting" data-reveal>
-  <form>
-    <p><h4><b>Setting</b></h4></p>
+    <form>
+        <p><h4><b>Setting</b></h4></p>
 
-    <div class="input-group" ui-header-setting-user>
-      <span class="input-group-label" style="width:40%"><b>User Name:</b></span>
-      <input class="input-group-field" type="text" name="user" pattern="[a-z0-9_]+"><br>
-    </div>
+        <div class="input-group" ui-header-setting-user>
+            <span class="input-group-label" style="width:40%"><b>User Name:</b></span>
+            <input class="input-group-field" type="text" name="user" pattern="[a-z0-9_]+"><br>
+        </div>
 
-    <input class="button expanded" type="submit" data-close>
-  </form>
+        <input class="button expanded" type="submit" data-close>
+    </form>
 </div>
 
 <div class="reveal" id="upload" data-reveal>
-  <form>
-    <p><h4><b>Upload</b></h4></p>
+    <form>
+        <p><h4><b>Upload</b></h4></p>
 
-    <div class="input-group-0" ui-header-setting-user>
-      <input class="input_file" type="file" name="file" required="required"/>
-    </div>
-
-    <div class="input-group choose-file" ui-header-setting-user>
-      <span class="input-group-label" style="width:40%"><b>Choose File:</b></span>
-      <input class="input-group-field" type="text" name="user" readonly required placeholder="Please choose mp4 file"><br>
-    </div>
-
-
-    <div class="flex-center">
-        <h6 style="text-align:center">Upload 0% </h6>
-        <div class="input-group-bar">
-            <div class="bar"></div>
+        <div class="input-group-0" ui-header-setting-user>
+            <input class="input_file" type="file" name="file" required="required"/>
         </div>
-    </div>
 
-    <input class="button expanded" type="button" value="Submit"  vadata-close>
-  </form>
+        <div class="input-group choose-file" ui-header-setting-user>
+            <span class="input-group-label" style="width:40%"><b>Choose File:</b></span>
+            <input class="input-group-field" type="text" name="user" readonly required
+                   placeholder="Please choose mp4 file"><br>
+        </div>
+
+
+        <div class="flex-center">
+            <h6 style="text-align:center">Upload 0% </h6>
+            <div class="input-group-bar">
+                <div class="bar"></div>
+            </div>
+        </div>
+
+        <input class="button expanded" type="button" value="Submit" vadata-close>
+    </form>
 </div>
 
 <div class="reveal" id="upload-offline" data-reveal>
-  <form>
-    <p><h4><b>Upload Offline</b></h4></p>
+    <form>
+        <p><h4><b>Upload Offline</b></h4></p>
 
-    <div class="input-group-0" ui-header-setting-user>
-      <input class="input_file" type="file" name="file" required="required"/>
-    </div>
-
-    <div class="input-group choose-file" ui-header-setting-user>
-      <span class="input-group-label" style="width:40%"><b>Choose File:</b></span>
-      <input class="input-group-field" type="text" name="user" readonly required placeholder="Please choose mp4 file"><br>
-    </div>
-
-
-    <div class="flex-center">
-        <h6 style="text-align:center">Upload 0% </h6>
-        <div class="input-group-bar">
-            <div class="bar"></div>
+        <div class="input-group-0" ui-header-setting-user>
+            <input class="input_file" type="file" name="file" required="required"/>
         </div>
-    </div>
 
-    <input class="button expanded" type="button" value="Submit"  vadata-close>
-  </form>
+        <div class="input-group choose-file" ui-header-setting-user>
+            <span class="input-group-label" style="width:40%"><b>Choose File:</b></span>
+            <input class="input-group-field" type="text" name="user" readonly required
+                   placeholder="Please choose mp4 file"><br>
+        </div>
+
+
+        <div class="flex-center">
+            <h6 style="text-align:center">Upload 0% </h6>
+            <div class="input-group-bar">
+                <div class="bar"></div>
+            </div>
+        </div>
+
+        <input class="button expanded" type="button" value="Submit" vadata-close>
+    </form>
 </div>
 
 <div class="reveal" id="clear" data-reveal>
-  <form>
-    <p><h4><b>Do you really want to clear?</b></h4></p>
+    <form>
+        <h4>Do you really want to clear?</h4>
+        <p><b>All the transcoded content will be removed.</b></p>
 
-    <input class="button expanded" type="submit" data-close>
-  </form>
+        <input class="button expanded" type="button" value="Yes">
+    </form>
+    <div id="clear-result">
+    </div>
 </div>

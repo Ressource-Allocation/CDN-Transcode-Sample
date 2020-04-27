@@ -147,16 +147,31 @@ function upload(isOffline = false) {
 
 //clear
 $("#clear").find("form .button").click(function () {
-    const xhr = $.get("/clear/", function () {
-        console.log("clear request sent");
-    })
-        .done(function () {
-            console.log("clear request received");
-        })
-        .fail(function () {
-            console.log("clear request error");
-        })
-        .always(function () {
-            console.log("clear request finished");
-        });
+    $("#clear-result").empty()
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", "/clear/");
+    xhr.responseType = "json"
+
+    xhr.onload = function () {
+        if (xhr.status !== 200) {
+            console.log("clear request error " + xhr.status);
+            $("#clear-result").append("<p>Error, Please try again</p>");
+            return;
+        }
+
+        const data = xhr.response
+        if (Object.keys(data).length === 0) {
+            $("#clear-result").append("<p>Nothing to clear</p>");
+            return;
+        }
+
+        $("#clear-result").append("<p>Result:</p>")
+        $("#clear-result p").append("<ul></ul>")
+        for (let i in data) {
+            $("#clear-result ul").append(`<li>${data[i]["type"]}/${data[i]["file"]}: ${data[i]["zk"]["state"]}</li>`)
+        }
+    };
+
+    xhr.send()
 })
