@@ -143,7 +143,7 @@ function upload(isOffline = false) {
 
 //clear
 $("#clear").find("form .button").click(function () {
-    var jqxhr = $.get("/clear", function () {
+    const xhr = $.get("/clear/", function () {
         console.log("clear request sent");
     })
         .done(function () {

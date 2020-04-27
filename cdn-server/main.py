@@ -2,6 +2,7 @@
 
 from tornado import ioloop, web
 from tornado.options import define, options, parse_command_line
+from clear import ClearHandler
 from playlist import PlayListHandler
 from schedule import ScheduleHandler
 from upload import UploadHandler, UploadOfflineHandler
@@ -12,6 +13,7 @@ APP = web.Application([
     (r'/schedule/.*', ScheduleHandler),
     (r'/upload/', UploadHandler),
     (r'/upload-offline/', UploadOfflineHandler),
+    (r'/clear/', ClearHandler),
 ])
 
 if __name__ == "__main__":
