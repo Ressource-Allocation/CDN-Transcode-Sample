@@ -13,6 +13,7 @@
           <li><a href="#" data-open="setting" class="menu-text"><i class="fi-key"></i>&nbsp;Setting</a></li>
           <li><a href="#" data-open="upload" class="menu-text"><i class="fi-key"></i>&nbsp;Upload</a></li>
           <li><a href="#" data-open="upload-offline" class="menu-text"><i class="fi-key"></i>&nbsp;Upload Offline</a></li>
+          <li><a href="#" data-open="clear" class="menu-text"><i class="fi-key"></i>&nbsp;Clear (WIP)</a></li>
         </ul>
       </li>
     </ul>
@@ -79,5 +80,13 @@
     </div>
 
     <input class="button expanded" type="button" value="Submit"  vadata-close>
+  </form>
+</div>
+
+<div class="reveal" id="clear" data-reveal>
+  <form>
+    <p><h4><b>Do you really want to clear?</b></h4></p>
+
+    <input class="button expanded" type="submit" data-close>
   </form>
 </div>

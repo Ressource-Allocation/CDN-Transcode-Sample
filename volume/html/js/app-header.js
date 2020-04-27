@@ -140,3 +140,19 @@ function upload(isOffline = false) {
         }
     }, 100)
 }
+
+//clear
+$("#clear").find("form .button").click(function () {
+    var jqxhr = $.get("/clear", function () {
+        console.log("clear request sent");
+    })
+        .done(function () {
+            console.log("clear request received");
+        })
+        .fail(function () {
+            console.log("clear request error");
+        })
+        .always(function () {
+            console.log("clear request finished");
+        });
+})
