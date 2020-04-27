@@ -3,19 +3,22 @@ import shutil
 from time import sleep
 from celery import Celery
 
+
 def del_file(path):
     if os.path.isdir(path):
         shutil.rmtree(path)
     if os.path.exists(path):
         os.remove(path)
 
+
 celery = Celery('tasks',
-    broker = 'redis://redis-service:6379',
-    brckend = 'redis://redis-service:6379')
+                broker='redis://redis-service:6379',
+                brckend='redis://redis-service:6379')
+
 
 @celery.task
 def in_out(proPath, srcPath, fileName, count):
-    i=0
+    i = 0
     while i < 10:
         if len(os.listdir(proPath)) == int(count) + 1:
             try:
@@ -23,7 +26,8 @@ def in_out(proPath, srcPath, fileName, count):
                     for i in range(0, int(count) + 1):
                         with open(os.path.join(proPath, str(i)), "rb") as data:
                             upload_file.write(data.read())
-                cmd = "ffmpeg -i " + os.path.join(srcPath, fileName) + " -vf thumbnail,scale=640:360 -frames:v 1 -y " + srcPath + "/" + fileName + ".png"
+                cmd = "ffmpeg -i " + os.path.join(srcPath,
+                                                  fileName) + " -vf thumbnail,scale=640:360 -frames:v 1 -y " + srcPath + "/" + fileName + ".png"
                 res = os.system(cmd)
                 if not res == 0:
                     raise Exception("image error")

@@ -16,29 +16,30 @@ ARCHIVE_ROOT = "/var/www/archive"
 DASH_ROOT = "/var/www/dash"
 HLS_ROOT = "/var/www/hls"
 
+
 def process_stream(stream):
     stream_name = stream.split("/")[1]
 
-    if not isfile(ARCHIVE_ROOT+"/"+stream_name):
+    if not isfile(ARCHIVE_ROOT + "/" + stream_name):
         return
 
-    zk = ZKState("/content_provider_transcoder/"+ARCHIVE_ROOT+"/"+stream)
+    zk = ZKState("/content_provider_transcoder/" + ARCHIVE_ROOT + "/" + stream)
     if zk.processed():
         zk.close()
         return
 
     if stream.endswith(".mpd"):
         try:
-            mkdir(DASH_ROOT+"/"+stream_name)
+            mkdir(DASH_ROOT + "/" + stream_name)
         except:
             pass
 
         if zk.process_start():
             try:
-                cmd = GetABRCommand(ARCHIVE_ROOT+"/"+stream_name, DASH_ROOT+"/"+stream_name, "dash")
+                cmd = GetABRCommand(ARCHIVE_ROOT + "/" + stream_name, DASH_ROOT + "/" + stream_name, "dash")
                 r = call(cmd)
                 if r:
-                    raise Exception("status code: "+str(r))
+                    raise Exception("status code: " + str(r))
                 zk.process_end()
             except:
                 print(traceback.format_exc(), flush=True)
@@ -46,22 +47,23 @@ def process_stream(stream):
 
     if stream.endswith(".m3u8"):
         try:
-            mkdir(HLS_ROOT+"/"+stream_name)
+            mkdir(HLS_ROOT + "/" + stream_name)
         except:
             pass
 
         if zk.process_start():
             try:
-                cmd = GetABRCommand(ARCHIVE_ROOT+"/"+stream_name, HLS_ROOT+"/"+stream_name, "hls")
+                cmd = GetABRCommand(ARCHIVE_ROOT + "/" + stream_name, HLS_ROOT + "/" + stream_name, "hls")
                 r = call(cmd)
                 if r:
-                    raise Exception("status code: "+str(r))
+                    raise Exception("status code: " + str(r))
                 zk.process_end()
             except:
                 print(traceback.format_exc(), flush=True)
                 zk.process_abort()
 
     zk.close()
+
 
 if __name__ == "__main__":
     c = Consumer(KAFKA_GROUP)

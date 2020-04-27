@@ -6,6 +6,7 @@ from tornado import web, gen
 
 ARCHIVE_ROOT = "/var/www/archive"
 
+
 class PlayListHandler(web.RequestHandler):
     def __init__(self, app, request, **kwargs):
         super(PlayListHandler, self).__init__(app, request, **kwargs)
@@ -22,5 +23,5 @@ class PlayListHandler(web.RequestHandler):
         self.set_status(200, "OK")
         self.set_header("Content-Type", "application/json")
         types = [("hls", ".m3u8"), ("dash", ".mpd")]
-        self.write(json.dumps([{"name":t[0]+"-"+s, "url":t[0]+"/"+s+"/index"+t[1],
-                                "img":"thumbnail/"+s+".png"} for t in types for s in streams]))
+        self.write(json.dumps([{"name": t[0] + "-" + s, "url": t[0] + "/" + s + "/index" + t[1],
+                                "img": "thumbnail/" + s + ".png"} for t in types for s in streams]))

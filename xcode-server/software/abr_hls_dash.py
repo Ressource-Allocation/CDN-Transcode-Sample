@@ -13,8 +13,10 @@ RENDITIONS_SAMPLE = (
     [640, 360, 800000, 128000]
 )
 
+
 def to_kps(bitrate):
-    return str(int(bitrate/1000))+"k"
+    return str(int(bitrate / 1000)) + "k"
+
 
 def GetABRCommand(in_file, target, streaming_type, renditions=RENDITIONS_SAMPLE, duration=2,
                   segment_num=0):
@@ -32,20 +34,20 @@ def GetABRCommand(in_file, target, streaming_type, renditions=RENDITIONS_SAMPLE,
     clip_v_duration = 0
     clip_a_duration = 0
 
-    segment_target_duration = duration       # try to create a new segment every X seconds
-    max_bitrate_ratio = 1.07          # maximum accepted bitrate fluctuations
-    rate_monitor_buffer_ratio = 1.5   # maximum buffer size between bitrate conformance checks
+    segment_target_duration = duration  # try to create a new segment every X seconds
+    max_bitrate_ratio = 1.07  # maximum accepted bitrate fluctuations
+    rate_monitor_buffer_ratio = 1.5  # maximum buffer size between bitrate conformance checks
 
     for item in clip_info["streams"]:
         if item["codec_type"] == "video":
-            keyframe_interval = int(eval(item["avg_frame_rate"])+0.5)
+            keyframe_interval = int(eval(item["avg_frame_rate"]) + 0.5)
             frame_height = item["height"]
             clip_v_duration = eval(item["duration"])
         if item["codec_type"] == "audio":
             clip_a_duration = eval(item["duration"])
 
     if segment_num != 0:
-        segment_duration = (int)((clip_v_duration+2.0)/segment_num)
+        segment_duration = (int)((clip_v_duration + 2.0) / segment_num)
         if segment_duration < segment_target_duration:
             segment_target_duration = segment_duration
 
@@ -59,7 +61,7 @@ def GetABRCommand(in_file, target, streaming_type, renditions=RENDITIONS_SAMPLE,
     cmd_hls = ["-hls_time", str(segment_target_duration), "-hls_list_size", "0"]
     cmd_fade_in_out = ["-an"]
 
-    master_playlist = "#EXTM3U" + "\n" + "#EXT-X-VERSION:3" +"\n" + "#" + "\n"
+    master_playlist = "#EXTM3U" + "\n" + "#EXT-X-VERSION:3" + "\n" + "#" + "\n"
 
     count = 0
     default_threshold = 4
@@ -82,24 +84,29 @@ def GetABRCommand(in_file, target, streaming_type, renditions=RENDITIONS_SAMPLE,
         cmd_4 = []
 
         if streaming_type == "hls":
-            cmd_1 = ["-vf", "scale=w="+str(width)+":"+"h="+str(height)+":"+"force_original_aspect_ratio=decrease"
-                     +","+ "pad=w="+str(width)+":"+"h="+str(height)+":"+"x=(ow-iw)/2"+":"+"y=(oh-ih)/2"]
+            cmd_1 = ["-vf",
+                     "scale=w=" + str(width) + ":" + "h=" + str(height) + ":" + "force_original_aspect_ratio=decrease"
+                     + "," + "pad=w=" + str(width) + ":" + "h=" + str(
+                         height) + ":" + "x=(ow-iw)/2" + ":" + "y=(oh-ih)/2"]
             cmd_2 = ["-b:v", v_bitrate, "-maxrate", maxrate, "-bufsize", bufsize]
             cmd_3 = ["-f", streaming_type]
-            cmd_4 = ["-hls_segment_filename", target+"/"+name+"_"+"%03d.ts", target+"/"+name+".m3u8"]
-            master_playlist += "#EXT-X-STREAM-INF:BANDWIDTH="+str(item[2])+","+"RESOLUTION="+str(width)+"x"+str(height)+"\n"+name+".m3u8"+"\n"
+            cmd_4 = ["-hls_segment_filename", target + "/" + name + "_" + "%03d.ts", target + "/" + name + ".m3u8"]
+            master_playlist += "#EXT-X-STREAM-INF:BANDWIDTH=" + str(item[2]) + "," + "RESOLUTION=" + str(
+                width) + "x" + str(height) + "\n" + name + ".m3u8" + "\n"
             cmd_abr += cmd_static + cmd_1 + cmd_2 + cmd_fade_in_out + cmd_3 + cmd_hls + cmd_4
 
         if streaming_type == "dash":
-            cmd_1 = ["-map", "0:v", "-b:v"+":"+str(count), v_bitrate, "-s:v"+":"+str(count), str(width)+"x"+str(height),
-                     "-maxrate"+":"+str(count), maxrate, "-bufsize"+":"+str(count), bufsize]
+            cmd_1 = ["-map", "0:v", "-b:v" + ":" + str(count), v_bitrate, "-s:v" + ":" + str(count),
+                     str(width) + "x" + str(height),
+                     "-maxrate" + ":" + str(count), maxrate, "-bufsize" + ":" + str(count), bufsize]
             cmd_2 = ["-an"]
             cmd_3 = ["-f", streaming_type]
-            cmd_4 = ["-init_seg_name", name+"-init-stream$RepresentationID$.m4s", "-media_seg_name",
-                     name+"-chunk-stream$RepresentationID$-$Number%05d$.m4s", "-y", target+"/"+name+".mpd"]
+            cmd_4 = ["-init_seg_name", name + "-init-stream$RepresentationID$.m4s", "-media_seg_name",
+                     name + "-chunk-stream$RepresentationID$-$Number%05d$.m4s", "-y", target + "/" + name + ".mpd"]
             if clip_a_duration == 0:
-                cmd_1 = ["-map", "0:v", "-b:v"+":"+str(count), v_bitrate, "-s:v"+":"+str(count), str(width)+"x"+str(height),
-                         "-maxrate"+":"+str(count), maxrate, "-bufsize"+":"+str(count), bufsize]
+                cmd_1 = ["-map", "0:v", "-b:v" + ":" + str(count), v_bitrate, "-s:v" + ":" + str(count),
+                         str(width) + "x" + str(height),
+                         "-maxrate" + ":" + str(count), maxrate, "-bufsize" + ":" + str(count), bufsize]
                 cmd_2 = []
             cmd_abr += cmd_1 + cmd_2
 
@@ -110,11 +117,11 @@ def GetABRCommand(in_file, target, streaming_type, renditions=RENDITIONS_SAMPLE,
     if streaming_type == "hls":
         cmd = cmd_base + cmd_abr
     elif streaming_type == "dash":
-        cmd = cmd_base + cmd_static + cmd_abr +["-f", "dash"] + cmd_dash + ["-y", target+"/"+"index.mpd"]
+        cmd = cmd_base + cmd_static + cmd_abr + ["-f", "dash"] + cmd_dash + ["-y", target + "/" + "index.mpd"]
 
-    #generate master m3u8 file
+    # generate master m3u8 file
     if streaming_type == "hls":
-        with open(target+"/"+"index.m3u8", "w", encoding='utf-8') as f:
+        with open(target + "/" + "index.m3u8", "w", encoding='utf-8') as f:
             f.write(master_playlist)
 
     return cmd

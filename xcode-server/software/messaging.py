@@ -8,6 +8,7 @@ import time
 
 KAFKA_HOSTS = ["kafka-service:9092"]
 
+
 class Producer(object):
     def __init__(self):
         super(Producer, self).__init__()
@@ -36,7 +37,8 @@ class Producer(object):
     def close(self):
         if self._producer:
             self._producer.close()
-            self._producer=None
+            self._producer = None
+
 
 class Consumer(object):
     def __init__(self, group=None):
@@ -59,7 +61,7 @@ class Consumer(object):
         # assign/subscribe topic
         partitions = c.partitions_for_topic(topic)
         if not partitions:
-            raise Exception("Topic "+topic+" not exist")
+            raise Exception("Topic " + topic + " not exist")
         c.assign([TopicPartition(topic, p) for p in partitions])
 
         # seek to beginning if needed
