@@ -88,7 +88,11 @@ function upload(isOffline = false) {
     $(".flex-center .input-group-bar").show()
     const LENGTH = 1024 * 1024 * 10;
     var timeStamp = new Date().getTime();
-    var fileName = $("#upload .choose-file .input-group-field").val();
+    if (isOffline) {
+        var fileName = $("#upload-offline .choose-file .input-group-field").val();
+    } else {
+        var fileName = $("#upload .choose-file .input-group-field").val();
+    }
     var file = document.querySelector(isOffline ? '#upload-offline .input_file' : '#upload .input_file').files[0];
     var totalSize = file.size;
     var start = 0;
