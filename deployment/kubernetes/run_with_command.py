@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 
-import yaml_utils
-import update_yaml
+import copy
+import functools
 import os
 import re
-import copy
 import subprocess
 import sys
-import socket
-import functools
+
+import update_yaml
+
 sys.path.append(sys.argv[1])
 
 
@@ -21,6 +21,7 @@ def get_node_num():
     print("There are " + str(node_num) +
           " kubernetes nodes on your host server!!!")
     return node_num
+
 
 def ping(host):
     cmd = 'ping -c %d %s' % (1, host)
@@ -38,6 +39,7 @@ def ping(host):
         return True
     else:
         return False
+
 
 def get_volume_directory(nfs_server, is_localhost):
     video_list = []
@@ -69,22 +71,25 @@ def get_volume_directory(nfs_server, is_localhost):
             result = [re.findall(r'[^\\\s/:\*\?"<>\|]+', i)
                       for i in re.findall(r'out:(.+)\n', exec_cmd.read())]
             video_list = [i for i in functools.reduce(
-                lambda x, y:x+y, result) if os.path.splitext(i)[1] == '.mp4']
+                lambda x, y: x + y, result) if os.path.splitext(i)[1] == '.mp4']
             break
         else:
             username = input(
                 "Input error, please input NFS server username again: ")
     return volume_directory, video_list
 
+
 def configure_basic_module(node_num):
     if node_num > 1:
         nfs_server = input(
             "Please input where the video clips server is ([NFS server IP address]): ")
         while True:
-            if re.match("((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))$", nfs_server):
+            if re.match("((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))$",
+                        nfs_server):
                 if not ping(nfs_server):
                     nfs_server = input(
-                        "Can't ping your NFS server ip address, please input where the video clips server is again ([NFS server IP address]): ")
+                        "Can't ping your NFS server ip address, please input where the video clips server is again "
+                        "([NFS server IP address]): ")
                     continue
                 volume_directory, video_list = get_volume_directory(
                     nfs_server, False)
@@ -96,25 +101,31 @@ def configure_basic_module(node_num):
         nfs_server = input(
             "Please input where the video clips server is ([localhost] or [NFS server IP address]): ")
         while True:
+            if nfs_server == "":
+                nfs_server = "localhost"
             if nfs_server == "localhost":
                 volume_directory, video_list = get_volume_directory(
                     nfs_server, True)
                 break
-            elif re.match("((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))", nfs_server):
+            elif re.match("((25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))",
+                          nfs_server):
                 if not ping(nfs_server):
                     nfs_server = input(
-                        "Can't ping your NFS server IP address, please input where the video clips server is again ([localhost] or [NFS server IP address]): ")
+                        "Can't ping your NFS server IP address, please input where the video clips server is again "
+                        "([localhost] or [NFS server IP address]): ")
                     continue
                 volume_directory, video_list = get_volume_directory(
                     nfs_server, False)
                 break
             else:
                 nfs_server = input(
-                    "Input error, please input where the video clips server is again ([localhost] or [NFS server IP address]): ")
+                    "Input error, please input where the video clips server is again "
+                    "([localhost] or [NFS server IP address]): ")
     if not video_list:
         print("\033[0;31;40mNo video clips were found!!!\033[0m")
         os._exit(1)
     return nfs_server, volume_directory, video_list
+
 
 def input_node_name(service_name, pods_dict, image_name="sw"):
     node_name_list = sw_node_name_list
@@ -142,13 +153,20 @@ def input_node_name(service_name, pods_dict, image_name="sw"):
     pods_dict[service_name]["node"] = node_name
     return pods_dict
 
+
 def input_request_cpu(service_name, node_dict, pods_dict):
     cpu_quota = input("Please input run " +
                       service_name + " request cpu core number: ")
     while True:
-        if re.match(r"\d{1,2}(\.\d+)?$", cpu_quota) and node_dict[pods_dict[service_name]["node"]]["cpu"] > float(cpu_quota) > 0:
+        if cpu_quota == "":
+            if service_name == "vod0":
+                cpu_quota = "6"
+            else:
+                cpu_quota = "0.2"
+        if re.match(r"\d{1,2}(\.\d+)?$", cpu_quota) and node_dict[pods_dict[service_name]["node"]]["cpu"] > float(
+                cpu_quota) > 0:
             node_dict[pods_dict[service_name]
-                      ["node"]]["cpu"] -= float(cpu_quota)
+            ["node"]]["cpu"] -= float(cpu_quota)
             pods_dict[service_name]["cpu"] = float(cpu_quota)
             break
         else:
@@ -156,13 +174,20 @@ def input_request_cpu(service_name, node_dict, pods_dict):
                               service_name + " request cpu core number again: ")
     return node_dict, pods_dict
 
+
 def input_request_mem(service_name, node_dict, pods_dict):
     mem_quota = input("Please input run " + service_name +
                       " request memory quota(MiB): ")
     while True:
-        if re.match(r"\d{3,5}$", mem_quota) and node_dict[pods_dict[service_name]["node"]]["memory"] > int(mem_quota) > 0:
+        if mem_quota == "":
+            if service_name == "vod0":
+                mem_quota = "4000"
+            else:
+                mem_quota = "500"
+        if re.match(r"\d{3,5}$", mem_quota) and node_dict[pods_dict[service_name]["node"]]["memory"] > int(
+                mem_quota) > 0:
             node_dict[pods_dict[service_name]["node"]
-                      ]["memory"] -= int(mem_quota)
+            ]["memory"] -= int(mem_quota)
             pods_dict[service_name]["memory"] = int(mem_quota)
             break
         else:
@@ -170,10 +195,16 @@ def input_request_mem(service_name, node_dict, pods_dict):
                               service_name + " request memory quota(MiB) again: ")
     return node_dict, pods_dict
 
+
 def deploy_transcode_cluster(service_name):
     ret = input("Do you need to deploy the " + service_name +
                 " transcode service? ([y] or [n]): ")
     while True:
+        if ret == "":
+            if service_name == "vod":
+                ret = "y"
+            else:
+                ret = "n"
         if ret.lower() == "y":
             configure_transcode_service(service_name)
             break
@@ -182,6 +213,7 @@ def deploy_transcode_cluster(service_name):
         else:
             ret = input("Input error, do you need to deploy the " +
                         service_name + " transcode service? ([y] or [n]): ")
+
 
 def configure_live_transcode_args(service_name, deploy_type, image_name):
     if deploy_type == "auto":
@@ -200,7 +232,8 @@ def configure_live_transcode_args(service_name, deploy_type, image_name):
                 break
             else:
                 input_video = input(
-                    "Input error, please choose the one video clip to transcode again (" + str(video_list)[1:-1] + "): ")
+                    "Input error, please choose the one video clip to transcode again (" + str(video_list)[
+                                                                                           1:-1] + "): ")
     pods_dict[service_name]["input"] = input_video
 
     output_channel = input("Please choose the output channel (1, 2 ,3, 4): ")
@@ -265,7 +298,8 @@ def configure_live_transcode_args(service_name, deploy_type, image_name):
                 break
             else:
                 protocol_key = input(
-                    "Input error, please choose the %dth output streaming media communication protocol again (%s): " % (i + 1, protocol_str))
+                    "Input error, please choose the %dth output streaming media communication protocol again (%s): " % (
+                        i + 1, protocol_str))
 
         pods_dict[service_name]["transcode" +
                                 str(i)]["protocol"] = protocol_dict[protocol_key.lower()]
@@ -276,7 +310,9 @@ def configure_live_transcode_args(service_name, deploy_type, image_name):
             if re.match(r'^[^\\\s/:\*\?"<>\|]+$', output_name):
                 if output_name in output_dict.keys():
                     output_name = input(
-                        "The output video clip name already exists, please enter the %dth output video clip name again: " % (i + 1))
+                        "The output video clip name already exists, please enter the %dth output video clip name "
+                        "again: " % (i + 1)
+                    )
                 else:
                     break
             else:
@@ -284,6 +320,7 @@ def configure_live_transcode_args(service_name, deploy_type, image_name):
                     "Input error, please enter the %dth output video clip name again: " % (i + 1))
         pods_dict[service_name]["transcode" + str(i)]["output"] = output_name
     return
+
 
 def configure_transcode_service(service_name):
     global hw_node_num
@@ -298,12 +335,15 @@ def configure_transcode_service(service_name):
             image_name = input("Please choose the transcode mode of the " + str(i) + "th" + service_name +
                                " ([hw]: hardware is for E3/VCA2 or [sw]: software is for E5): ")
             while True:
+                if image_name == "":
+                    image_name = "sw"
                 if image_name.lower() == "sw" or image_name.lower() == "hw":
                     hw_node_num -= 1 if image_name.lower() == "hw" else 0
                     break
                 else:
-                    image_name = input("Input error, please choose the transcode mode of the " + str(i) + "th" + service_name +
-                                       " again ([hw]: hardware is for E3/VCA2 or [sw]: software is for E5): ")
+                    image_name = input(
+                        "Input error, please choose the transcode mode of the " + str(i) + "th" + service_name +
+                        " again ([hw]: hardware is for E3/VCA2 or [sw]: software is for E5): ")
         else:
             image_name = "sw"
         pods_dict[service_name_index]["mode"] = image_name
@@ -320,7 +360,8 @@ def configure_transcode_service(service_name):
                     break
                 else:
                     deploy_type = input(
-                        "Input error, do you need to deploy live-transcode-service by customizing parameters([y] or [n]): ")
+                        "Input error, do you need to deploy live-transcode-service by customizing parameters"
+                        "([y] or [n]): ")
 
             configure_live_transcode_args(
                 service_name_index, deploy_type, image_name.lower())
@@ -329,6 +370,8 @@ def configure_transcode_service(service_name):
         create_node = input("Do you still need to deploy the " +
                             str(i + 1) + "th " + service_name + "? ([y] or [n]): ")
         while True:
+            if create_node == "":
+                create_node = "n"
             if create_node.lower() == "y" or create_node.lower() == "n":
                 break
             else:
@@ -337,17 +380,18 @@ def configure_transcode_service(service_name):
         if create_node.lower() == "n":
             break
 
+
 def get_node_information():
     node_dict = {}
     basic_info = os.popen("kubectl describe node").read()
     index_list = [i.start() for i in re.finditer("Name:", basic_info)]
     for i in range(len(index_list)):
         cpu_info = re.findall(
-            "(\d+)", os.popen("kubectl describe node | awk -F ' ' '$1==\"cpu\"' |awk 'NR==" + str(i+1) + "'").read())
+            "(\d+)", os.popen("kubectl describe node | awk -F ' ' '$1==\"cpu\"' |awk 'NR==" + str(i + 1) + "'").read())
         memory_info = re.findall(
             "(\d+)", os.popen("kubectl describe node | awk -F ' ' '$1==\"memory\" {print $0}'").read())
         cpu = int(int(re.search(
-            "cpu:\s+(\d+)", basic_info[index_list[i]: -1]).group(1)) - int(cpu_info[0])/1000)
+            "cpu:\s+(\d+)", basic_info[index_list[i]: -1]).group(1)) - int(cpu_info[0]) / 1000)
         memory = int((int(re.search(
             "memory:\s+(\d+)", basic_info[index_list[i]: -1]).group(1)) / 1024 - int(memory_info[0])))
         if cpu > 0 and memory > 0:
