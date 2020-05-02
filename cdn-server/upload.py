@@ -1,11 +1,11 @@
 import os
-import shutil
 import time
 import traceback
 from os.path import isfile
 
 from tornado import gen
 from tornado.web import RequestHandler
+
 from messaging import Producer
 from tasks import in_out
 
@@ -30,7 +30,7 @@ class UploadHandler(RequestHandler):
                 f.write(file[0]['body'])
                 self.set_status(200)
             if uploadStatus == 'end':
-                res = in_out.delay(proPath, ARCHIVE_ROOT, fileName, count)
+                in_out.delay(proPath, ARCHIVE_ROOT, fileName, count)
         except:
             self.set_status(401)
             print(traceback.format_exc(), flush=True)
@@ -44,6 +44,7 @@ class UploadOfflineHandler(RequestHandler):
         uploadStatus = self.get_body_argument('uploadStatus', None)
         timeStamp = self.get_body_argument('timeStamp', None)
         count = self.get_body_argument('count', None)
+        streamType = self.get_body_argument('type', "dash")
         fileName = timeStamp + "-" + fileName
         proPath = os.path.join(TEMP_ROOT, fileName)
         if not os.path.isdir(proPath):
@@ -53,10 +54,10 @@ class UploadOfflineHandler(RequestHandler):
                 f.write(file[0]['body'])
                 self.set_status(200)
             if uploadStatus == 'end':
-                res = in_out.delay(proPath, ARCHIVE_ROOT, fileName, count)
+                in_out.delay(proPath, ARCHIVE_ROOT, fileName, count)
 
                 # schedule producing the stream
-                stream = "dash/" + fileName + "/index.mpd"
+                stream = streamType + "/" + fileName + "/index." + ("m3u8" if streamType == "hls" else "mpd")
                 print("request received to process offline stream: " + stream, flush=True)
 
                 start_time = time.time()

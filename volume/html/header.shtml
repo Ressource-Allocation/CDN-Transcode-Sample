@@ -75,6 +75,14 @@
                    placeholder="Please choose mp4 file"><br>
         </div>
 
+        <div class="input-group select-type" ui-header-setting-user>
+            <span class="input-group-label" style="margin: 0 0 1rem;">Stream type</span>
+            <select name="type" required>
+                <option value="dash">DASH</option>
+                <option value="hls">HLS</option>
+            </select>
+        </div>
+
 
         <div class="flex-center">
             <h6 style="text-align:center">Upload 0% </h6>

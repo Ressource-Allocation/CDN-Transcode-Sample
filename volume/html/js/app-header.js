@@ -90,6 +90,7 @@ function upload(isOffline = false) {
     var timeStamp = new Date().getTime();
     if (isOffline) {
         var fileName = $("#upload-offline .choose-file .input-group-field").val();
+        var type = $("#upload-offline select").val();
     } else {
         var fileName = $("#upload .choose-file .input-group-field").val();
     }
@@ -106,7 +107,12 @@ function upload(isOffline = false) {
         if (start < totalSize) {
             fd = new FormData();
             xhr = new XMLHttpRequest();
-            xhr.open('POST', isOffline ? '/upload-offline/' : '/upload/', false);
+            if (isOffline) {
+                xhr.open('POST', '/upload-offline/', false);
+                fd.append('type', type);
+            } else {
+                xhr.open('POST', '/upload/', false);
+            }
             blob = file.slice(start, end);
             fd.append('file', blob);
             fd.append('fileName', fileName);
@@ -117,7 +123,7 @@ function upload(isOffline = false) {
             }
             xhr.send(fd);
             console.log(xhr.status)
-            if (xhr.status != 200) {
+            if (xhr.status !== 200) {
                 console.log("error" + xhr.status)
                 $(".flex-center h6").html("Error, Please try again")
                 $(".flex-center .input-group-bar").hide()
