@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 
+import os
+
 from tornado import ioloop, web
 from tornado.options import define, options, parse_command_line
+
 from clear import ClearHandler
 from playlist import PlayListHandler
 from schedule import ScheduleHandler
-from streams import StreamsHandler
 from upload import UploadHandler, UploadOfflineHandler
-import os
 
 APP = web.Application([
     (r'/playlist', PlayListHandler),
@@ -15,7 +16,6 @@ APP = web.Application([
     (r'/upload/', UploadHandler),
     (r'/upload-offline/', UploadOfflineHandler),
     (r'/clear/', ClearHandler),
-    (r'/streams/', StreamsHandler),
 ])
 
 if __name__ == "__main__":

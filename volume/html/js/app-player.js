@@ -65,9 +65,20 @@ $("#player").on(":play", function (e, url) {
     plist.empty();
     apiHost.playList(settings.user()).then(function (data) {
         $.each(data, function (k,v) {
-            var line=$('<tr><td><a href="javascript:void(0)"><img src="'+v.img+'" alt="'+v.name+'"/><figcaption>'+v.name+'</figcaption></a></td></tr>');
+            let icon
+            switch (v.zk.state) {
+                case "Processed":
+                    icon = "check"
+                    break;
+                case "Processing":
+                    icon = "refresh"
+                    break;
+                default:
+                    icon = "video"
+            }
+            var line = $('<tr><td><i class="fi-' + icon + '"></i><a href="javascript:void(0)"><img src="' + v.img + '" alt="' + v.name + '"/><figcaption>' + v.name + '</figcaption></a></td></tr>');
             line.find("a").click(function () {
-                var e = $.Event("keydown", { keyCode: 13 });
+                var e = $.Event("keydown", {keyCode: 13});
                 $("#player input").val(v.url).trigger(e);
             });
             plist.append(line);

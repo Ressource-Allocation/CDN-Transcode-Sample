@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 
+import json
 from subprocess import call
 from typing import NewType
 
 from tornado import web, gen
-import json
-from zkstate import ZKState
+
 from streams import get_streams
+from zkstate import ZKState
 
 ARCHIVE_ROOT = "/var/www/archive"
 DASH_ROOT = "/var/www/dash"
@@ -30,13 +31,12 @@ class ClearHandler(web.RequestHandler):
                 root = DASH_ROOT if s["type"] == "dash" else HLS_ROOT
                 r = call(["rm", "-rf", root + "/" + s["file"]])
                 if r != 0:
-                    print("Failed to rm: " + s["zk"]["path"], flush=True)
+                    print("Failed to rm: " + s["name"], flush=True)
                     s["zk"]["state"] = "Failed"
                 else:
                     s["zk"]["state"] = "Cleared"
             else:
                 print("Failed to clear or not processed: " + s["zk"]["path"], flush=True)
-                s["zk"]["state"] = "Failed"
 
         self.set_status(200, "OK")
         self.set_header("Content-Type", "application/json")

@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
-from os import listdir
 import json
+
 from tornado import web, gen
+
+from streams import get_streams
 
 ARCHIVE_ROOT = "/var/www/archive"
 
@@ -14,14 +16,13 @@ class PlayListHandler(web.RequestHandler):
 
     @gen.coroutine
     def get(self):
-        try:
-            streams = [s for s in listdir(ARCHIVE_ROOT) if s.endswith((".mp4", ".avi"))]
-        except:
-            self.set_status(404, "VIDEO NOT FOUND")
+        streams = get_streams()
+
+        if streams is None:
+            print("Error while parsing folders", flush=True)
+            self.set_status(500, "Internal Error")
             return
 
         self.set_status(200, "OK")
         self.set_header("Content-Type", "application/json")
-        types = [("hls", ".m3u8"), ("dash", ".mpd")]
-        self.write(json.dumps([{"name": t[0] + "-" + s, "url": t[0] + "/" + s + "/index" + t[1],
-                                "img": "thumbnail/" + s + ".png"} for t in types for s in streams]))
+        self.write(json.dumps(streams))
