@@ -8,6 +8,10 @@ ZK_HOSTS = 'zookeeper-service:2181'
 
 
 class ZKState(object):
+    """
+    we have a ZKState for each transcoded video. After a video is transcoded,
+    teh corresponding ZKState object is "processed"
+    """
     def __init__(self, path, name=None):
         super(ZKState, self).__init__()
         options = {"max_tries": -1, "max_delay": 5, "ignore_expire": True}
@@ -88,6 +92,7 @@ class ZKState(object):
 
         """
         if self.processed():
+            # A "processed" video is a video whose transcoding has ended
             self._zk.delete(self._path + "/" + self._name + "complete")
             ret = self.processed() is None
         else:
